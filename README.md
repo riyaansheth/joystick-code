@@ -1,50 +1,30 @@
-int xPin = A0;           // Joystick X-axis
-int yPin = A1;           // Joystick Y-axis
-int buttonPin = 2;       // Joystick button (switch)
-
-int xVal = 0;
-int yVal = 0;
-int buttonState = 0;
-
-const int threshold = 200;    // Sensitivity threshold from center
-
-void setup() {
-  pinMode(buttonPin, INPUT_PULLUP);  // Joystick button
-  Serial.begin(9600);                // Start serial communication
+#include <Servo.h>
+#define SERVO_PIN 9
+#define GROUND_JOY_PIN A5
+#define VOUT_JOY_PIN A4
+#define XJOY_PIN A3
+#define YJOY_PIN A2
+#define SJOY_PIN A1
+int servo_val;
+Servo myservo ;
+void setup()
+{
+ Serial.begin(9600);
+ pinMode(VOUT_JOY_PIN, OUTPUT) ;    //pin A4 shall be used as output
+ pinMode(GROUND_JOY_PIN, OUTPUT) ;  //pin A5 shall be used as output
+ digitalWrite(VOUT_JOY_PIN, HIGH) ; //set pin A4 to high (+5V)
+ digitalWrite(GROUND_JOY_PIN,LOW) ; //set pin A5 to low (ground)
+ myservo.attach(9);
 }
-
-void loop() {
-  xVal = analogRead(xPin);           // Read joystick X-axis
-  yVal = analogRead(yPin);           // Read joystick Y-axis
-  buttonState = digitalRead(buttonPin); // Read joystick button
-
-  String direction = "";
-
-  // Determine direction based on thresholds
-  if (xVal < (512 - threshold)) {
-    direction = "LEFT";
-  } else if (xVal > (512 + threshold)) {
-    direction = "RIGHT";
-  }
-
-  if (yVal < (512 - threshold)) {
-    if (direction != "") direction += " & ";
-    direction += "UP";
-  } else if (yVal > (512 + threshold)) {
-    if (direction != "") direction += " & ";
-    direction += "DOWN";
-  }
-
-  if (direction == "") direction = "CENTER";
-
-  Serial.print("X: ");
-  Serial.print(xVal);
-  Serial.print(" | Y: ");
-  Serial.print(yVal);
-  Serial.print(" | Button: ");
-  Serial.print(buttonState == LOW ? "Pressed" : "Released");
-  Serial.print(" | Direction: ");
-  Serial.println(direction);
-
-  delay(150);
+void loop()
+{
+ delay(200);
+ int joystickXVal = analogRead(XJOY_PIN) ;
+ servo_val=map(joystickXVal, 4, 1017, 10, 175);
+ Serial.print(joystickXVal);
+ Serial.println(" = input from joystick");
+ Serial.print(servo_val);
+ Serial.println(" = output to servo");
+ Serial.println() ;
+ myservo.write(servo_val);
 }
